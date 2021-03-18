@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import HighchartsStock from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import demoData from "../utils/demoData";
@@ -21,6 +21,20 @@ ichimoku(HighchartsStock);
 //     ["month", [1, 2, 3, 4, 6]]
 // ];
 
+HighchartsStock.seriesTypes.column.prototype.pointAttribs = (function(func) {
+    return function(point, state) {
+        let attribs = func.apply(this, arguments);
+
+        let candleSeries = this.chart.series[0]; // Probably you'll need to change the index
+        let candlePoint = candleSeries.points.filter(function(p) { return p.index === point.index; })[0];
+
+        let color = (candlePoint.open > candlePoint.close) ? '#f84960' : '#02c076'; // Replace with your colors
+        attribs.fill = state === 'hover' ? HighchartsStock.Color(color).brighten(0.3).get() : color;
+
+        return attribs;
+    };
+}(HighchartsStock.seriesTypes.column.prototype.pointAttribs));
+
 const mockOptions = {
 
     rangeSelector: {
@@ -38,14 +52,57 @@ const mockOptions = {
     plotOptions: {
         series: {
             showInLegend: true
+        },
+        candlestick: {
+            color: '#f84960',
+            upColor: '#02c076',
         }
     },
 
+    yAxis: [{
+        labels: {
+            align: 'right',
+            x: -3
+        },
+        title: {
+            text: 'OHLC'
+        },
+        height: '60%',
+        lineWidth: 2,
+        resize: {
+            enabled: true
+        }
+    }, {
+        labels: {
+            align: 'right',
+            x: -3
+        },
+        title: {
+            text: 'Volume'
+        },
+        top: '65%',
+        height: '35%',
+        offset: 0,
+        lineWidth: 2
+    }],
+
+    tooltip: {
+        split: true
+    },
+
     series: [{
-        type: 'ohlc',
+        type: 'candlestick',
         id: 'aapl',
         name: 'AAPL Stock Price',
-        data: formatData(demoData)
+        data: formatData(demoData).ohlc
+    }, {
+        type: 'column',
+        name: 'Volume',
+        data: formatData(demoData).volume,
+        yAxis: 1,
+        // dataGrouping: {
+        //     units: groupingUnits
+        // }
     }, {
         type: 'ikh',
         linkedTo: 'aapl',
@@ -84,6 +141,10 @@ const mockOptions = {
 };
 
 const TradingChart = () => {
+
+    // useEffect(() => {
+    //
+    // }, []);
 
     return (
         <>

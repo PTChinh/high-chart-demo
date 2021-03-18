@@ -1,6 +1,6 @@
 const formatData = (demoData) => {
     let ohlc = [],
-        // volume = [],
+        volume = [],
         dataLength = demoData.length,
         i = 0;
 
@@ -13,13 +13,13 @@ const formatData = (demoData) => {
             demoData[i][4] // close
         ]);
 
-        // volume.push([
-        //     demoData[i][0], // the date
-        //     demoData[i][5] // the volume
-        // ]);
+        volume.push([
+            demoData[i][0], // the date
+            demoData[i][5] // the volume
+        ]);
     }
 
-    return ohlc;
+    return {ohlc, volume};
 }
 
 export default formatData;
