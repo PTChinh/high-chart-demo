@@ -2,103 +2,85 @@ import React from "react";
 import HighchartsStock from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import demoData from "../utils/demoData";
+import formatData from "../utils/formatData";
+import indicator from 'highcharts/indicators/indicators';
+import ichimoku from 'highcharts/indicators/ichimoku-kinko-hyo';
+import dataModule from 'highcharts/modules/data';
+import exportingModule from 'highcharts/modules/exporting';
 
-const groupingUnits = [
-    [
-        "week", // unit name
-        [1] // allowed multiples
-    ],
-    ["month", [1, 2, 3, 4, 6]]
-];
+indicator(HighchartsStock);
+dataModule(HighchartsStock);
+exportingModule(HighchartsStock);
+ichimoku(HighchartsStock);
+
+// const groupingUnits = [
+//     [
+//         "week", // unit name
+//         [1] // allowed multiples
+//     ],
+//     ["month", [1, 2, 3, 4, 6]]
+// ];
 
 const mockOptions = {
-    plotOptions: {
-        candlestick: {
-            color: '#f84960',
-            upColor: '#02c076',
-        }
-    },
 
     rangeSelector: {
-        selected: 1
+        selected: 2
     },
 
     title: {
-        text: "AAPL Historical"
+        text: 'AAPL Stock Price'
     },
 
-    yAxis: [
-        {
-            labels: {
-                align: "right",
-                x: -3
-            },
-            title: {
-                text: "OHLC"
-            },
-            height: "60%",
-            lineWidth: 2,
-            resize: {
-                enabled: true
+    legend: {
+        enabled: true
+    },
+
+    plotOptions: {
+        series: {
+            showInLegend: true
+        }
+    },
+
+    series: [{
+        type: 'ohlc',
+        id: 'aapl',
+        name: 'AAPL Stock Price',
+        data: formatData(demoData)
+    }, {
+        type: 'ikh',
+        linkedTo: 'aapl',
+        tenkanLine: {
+            styles: {
+                lineColor: 'lightblue'
             }
         },
-        {
-            labels: {
-                align: "right",
-                x: -3
-            },
-            title: {
-                text: "Volume"
-            },
-            top: "65%",
-            height: "35%",
-            offset: 0,
-            lineWidth: 2
-        }
-    ],
-
-    tooltip: {
-        split: true
-    },
-
-    chart: {
-        backgroundColor: '#282c34'
-    },
-
-    series: [
-        {
-            type: "candlestick",
-            data: (function() {
-                let ohlcData = [];
-
-                for (let i = 0; i < demoData.length; i++) {
-                    ohlcData.push([
-                        demoData[i][0], // the date
-                        demoData[i][1], // open
-                        demoData[i][2], // high
-                        demoData[i][3], // low
-                        demoData[i][4] // close
-                    ]);
-                }
-                return ohlcData;
-            })(),
+        kijunLine: {
+            styles: {
+                lineColor: 'darkred'
+            }
         },
-        {
-            type: "column",
-            data: (function() {
-                let columnData = [];
-
-                for (let i = 0; i < demoData.length; i++) {
-                    columnData.push([
-                        demoData[i][0], // the date
-                        demoData[i][5] // the volume
-                    ]);
-                }
-                return columnData;
-            })(),
-            yAxis: 1
+        chikouLine: {
+            styles: {
+                lineColor: 'lightgreen'
+            }
+        },
+        senkouSpanA: {
+            styles: {
+                lineColor: 'green'
+            }
+        },
+        senkouSpanB: {
+            styles: {
+                lineColor: 'red'
+            }
+        },
+        senkouSpan: {
+            color: 'rgba(0, 255, 0, 0.3)',
+            styles: {
+                fill: 'rgba(0, 0, 255, 0.1)'
+            }
         }
-    ]
+    }]
 };
 
 const TradingChart = () => {
